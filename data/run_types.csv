@@ -1,0 +1,25 @@
+Run Type,Category
+Foundation Run,Base Building and Aerobic Development
+Recovery Run,Base Building and Aerobic Development
+Long Run,Base Building and Aerobic Development
+Steady State Run,Base Building and Aerobic Development
+Depletion Run,Base Building and Aerobic Development
+Speed Intervals Run,Speed and Anaerobic Development
+5K Pace Intervals,Speed and Anaerobic Development
+10K Pace Intervals,Speed and Anaerobic Development
+Critical Velocity Run,Speed and Anaerobic Development
+Accelerations Run,Speed and Anaerobic Development
+Hill Repetitions Run,Speed and Anaerobic Development
+Lactate Intervals Run,Lactate Threshold and Tempo Training
+Tempo Run,Lactate Threshold and Tempo Training
+Half-Marathon Pace Run,Lactate Threshold and Tempo Training
+Marathon Pace Run,Lactate Threshold and Tempo Training
+10K Relaxed Time Trial,Lactate Threshold and Tempo Training
+Progression Run,Race Simulation and Pacing
+Progression Intervals Run,Race Simulation and Pacing
+Zone 3 Fast Finish Run,Race Simulation and Pacing
+Over/Under Intervals Run,Race Simulation and Pacing
+Descending Intervals Run,Race Simulation and Pacing
+Variable-Intensity Intervals Run,Variety and Mixed Intensity
+Fartlek Run,Variety and Mixed Intensity
+Running,Base Building and Aerobic Development
