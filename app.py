@@ -8,8 +8,72 @@ from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
+from imblearn.over_sampling import SMOTE
+from sklearn.cluster import KMeans
+from mpl_toolkits.mplot3d import Axes3D
 
 load_dotenv()
+
+run_attributes = [
+    'Distance', 'Calories', 'Time',
+    'Avg HR', 'Max HR', 'Aerobic TE',
+    'Avg Run Cadence', 'Max Run Cadence',
+    'Avg Pace', 'Best Pace', 'Total Ascent',
+    'Total Descent', 'Avg Stride Length',
+    'Min Temp', 'Number of Laps', 'Max Temp',
+    'Moving Time', 'Elapsed Time',
+    'Min Elevation', 'Max Elevation'
+]
+
+
+def generate_n_clusters(filename, run_attrs, n_clusters=5):
+    data = pd.read_csv(filename, header=0, sep=',')
+    X, y = SMOTE().fit_resample(
+        data.drop(columns=['Date', 'Run Category', 'Run Type']),
+        data['Run Category']
+    )
+
+    kmeans = KMeans(
+        n_clusters=n_clusters,
+        random_state=42
+    )
+    kmeans.fit(X[run_attrs])
+    labels = kmeans.labels_
+
+    fig = plt.figure(figsize=(14, 10))
+
+    if len(run_attrs) == 2:
+        ax = fig.add_subplot(111)
+    elif len(run_attrs) == 3:
+        ax = fig.add_subplot(111, projection='3d')
+    else:
+        raise ValueError('Number of features should be 2 or 3')
+
+    for cluster in range(n_clusters):
+        if len(run_attrs) == 2:
+            ax.scatter(
+                X.loc[labels == cluster, run_attrs[0]],
+                X.loc[labels == cluster, run_attrs[1]],
+                label=f'Run Type {cluster + 1}'
+            )
+            ax.set_xlabel(run_attrs[0])
+            ax.set_ylabel(run_attrs[1])
+        elif len(run_attrs) == 3:
+            ax.scatter(
+                X.loc[labels == cluster, run_attrs[0]],
+                X.loc[labels == cluster, run_attrs[1]],
+                X.loc[labels == cluster, run_attrs[2]],
+                label=f'Run Type {cluster + 1}'
+            )
+
+            ax.set_xlabel(run_attrs[0])
+            ax.set_ylabel(run_attrs[1])
+            ax.set_zlabel(run_attrs[2])
+
+    ax.legend()
+
+    return fig
+
 
 def generate_clusters(filename, n_clusters=5):
     data = pd.read_csv(filename, header=0, sep=',')
@@ -78,35 +142,32 @@ with gr.Blocks(fill_height=True) as demo:
 
             data_file = gr.File(label="Running Data")
             n_clusters = gr.Slider(
-                value=5, minimum=1, maximum=10, step=1, label="Run Categories"
+                value=5, minimum=1, maximum=10, step=1, label="Number of Run Types"
+            )
+            run_attrs = gr.Dropdown(
+                run_attributes,
+                label="Select 2-3 Attributes",
+                multiselect=True,
+                render=True
             )
             analyze_runs_button = gr.Button("Analyze Runs")
 
     with gr.Row():
         with gr.Column():
-            gr.Markdown("## Run Type Categories")
+            gr.Markdown("## Run Types")
             run_cat_plot = gr.Plot(
-                label="Run Categories",
+                label="Run Types",
                 format="png",
-                container=True
+                container=True,
+
             )
 
     analyze_runs_button.click(
-        generate_clusters,
-        inputs=[data_file, n_clusters],
+        # generate_clusters,
+        generate_n_clusters,
+        inputs=[data_file, run_attrs, n_clusters],
         outputs=run_cat_plot
     )
-        # gr.Interface(
-        #     fn=generate_clusters,
-        #     inputs=[
-        #         gr.File(label="Running Data"),
-        #         gr.Slider(
-        #             value=5, minimum=1, maximum=10, step=1, label="Number of Clusters"),
-        #         gr.Slider(
-        #             value=2, minimum=1, maximum=10, step=1, label="Number of Components"),
-        #     ],
-        #     outputs=gr.Plot(label="Run Categories", format="png")
-        # )
 
     # import random
     # def random_response(message, history):
