@@ -25,9 +25,9 @@ run_attributes = [
     'Min Elevation', 'Max Elevation'
 ]
 
-
 def generate_n_clusters(filename, run_attrs, n_clusters=5):
     data = pd.read_csv(filename, header=0, sep=',')
+    print(data.columns)
     X, y = SMOTE().fit_resample(
         data.drop(columns=['Date', 'Run Category', 'Run Type']),
         data['Run Category']
@@ -72,7 +72,7 @@ def generate_n_clusters(filename, run_attrs, n_clusters=5):
 
     ax.legend()
 
-    return fig
+    return [fig, fig]
 
 
 def generate_clusters(filename, n_clusters=5):
@@ -154,36 +154,25 @@ with gr.Blocks(fill_height=True) as demo:
 
     with gr.Row():
         with gr.Column():
-            gr.Markdown("## Run Types")
+            run_types_plot = gr.Plot(
+                label="Logged Run Types",
+                format="png",
+                container=True
+            )
+
+        with gr.Column():
             run_cat_plot = gr.Plot(
-                label="Run Types",
+                label="Clustered Run Types",
                 format="png",
                 container=True,
 
             )
 
     analyze_runs_button.click(
-        # generate_clusters,
         generate_n_clusters,
         inputs=[data_file, run_attrs, n_clusters],
-        outputs=run_cat_plot
+        outputs=[run_types_plot, run_cat_plot]
     )
-
-    # import random
-    # def random_response(message, history):
-    #     return random.choice(["Yes", "No"])
-
-    # with gr.Row():
-    #     with gr.Column():
-    #         gr.Markdown("Ask your coach for help...")
-    #         gr.ChatInterface(
-    #             random_response,
-    #             examples=[
-    #                 "Write me a running plan for 5k tailored to my stats",
-    #                 "hola",
-    #                 "merhaba"
-    #             ]
-    #         )
 
 if __name__ == "__main__":
     demo.launch()
