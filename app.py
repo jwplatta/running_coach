@@ -25,6 +25,40 @@ run_attributes = [
     'Min Elevation', 'Max Elevation'
 ]
 
+def run_category_fig(X, y, run_attrs):
+    fig = plt.figure(figsize=(14, 10))
+    if len(run_attrs) == 2:
+        ax = fig.add_subplot(111)
+    elif len(run_attrs) == 3:
+        ax = fig.add_subplot(111, projection='3d')
+    else:
+        raise ValueError('Number of features should be 2 or 3')
+
+    for run_category in y.unique():
+        if len(run_attrs) == 2:
+            ax.scatter(
+                X.loc[y == run_category, run_attrs[0]],
+                X.loc[y == run_category, run_attrs[1]],
+                label=f'{run_category}'
+            )
+            ax.set_xlabel(run_attrs[0])
+            ax.set_ylabel(run_attrs[1])
+        elif len(run_attrs) == 3:
+            ax.scatter(
+                X.loc[y == run_category, run_attrs[0]],
+                X.loc[y == run_category, run_attrs[1]],
+                X.loc[y == run_category, run_attrs[2]],
+                label=f'{run_category}'
+            )
+
+            ax.set_xlabel(run_attrs[0])
+            ax.set_ylabel(run_attrs[1])
+            ax.set_zlabel(run_attrs[2])
+
+    ax.legend()
+
+    return fig
+
 def generate_n_clusters(filename, run_attrs, n_clusters=5):
     data = pd.read_csv(filename, header=0, sep=',')
     print(data.columns)
@@ -39,6 +73,7 @@ def generate_n_clusters(filename, run_attrs, n_clusters=5):
     )
     kmeans.fit(X[run_attrs])
     labels = kmeans.labels_
+    print('LABELS: ', labels)
 
     fig = plt.figure(figsize=(14, 10))
 
@@ -72,7 +107,7 @@ def generate_n_clusters(filename, run_attrs, n_clusters=5):
 
     ax.legend()
 
-    return [fig, fig]
+    return [run_category_fig(X, y, run_attrs), fig]
 
 
 def generate_clusters(filename, n_clusters=5):
